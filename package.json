@@ -1,0 +1,15 @@
+{
+    "name": "weather-forecast-course-jsvanilla",
+    "version": "1.0.0",
+    "description": "Weather forecast application",
+    "main": "index.js",
+    "scripts": {
+      "test": "mocha test/**/*.test.js",
+      "test:watch": "mocha test/**/*.test.js --watch"
+    },
+  "devDependencies": {
+    "chai": "^5.2.0",
+    "jsdom": "^26.0.0",
+    "mocha": "^11.1.0"
+  }
+}

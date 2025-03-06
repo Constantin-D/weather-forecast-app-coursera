@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LiveSky Europe | 7-Day Prediction</title>
+    <meta
+      name="description"
+      content="Check the 7-day weather forecast for major European cities."
+    />
+    <meta
+      name="keywords"
+      content="weather, forecast, europe, cities, 7-day forecast"
+    />
+    <meta name="author" content="Constantin Dugard" />
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+    <meta
+      name="description"
+      content="European Weather Forecast for major cities in Europe."
+    />
+    <meta
+      name="keywords"
+      content="weather, forecast, europe, cities, 7-day forecast"
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+    <!-- Favicon -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./assets/favicon_io/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./assets/favicon_io/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./assets/favicon_io/favicon-16x16.png"
+    />
+    <link rel="manifest" href="./assets/favicon_io/site.webmanifest" />
+    <!-- Open Graph (SEO & Social Media) -->
+    <meta property="og:title" content="European Weather Forecast" />
+    <meta
+      property="og:description"
+      content="Check the 7-day weather forecast for major European cities."
+    />
+    <meta
+      property="og:image"
+      content="https://example.com/weather-preview.jpg"
+    />
+    <meta property="og:url" content="https://example.com" />
+    <meta property="og:type" content="website" />
+    <!-- Google Fonts Optimization -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@400;600&display=swap&text=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789°%25%2C%2E&font-display=swap"
+      rel="stylesheet"
+    />
+    <!-- Preload Images -->
+    <link
+      rel="preload"
+      as="image"
+      href="./assets/images/kenji-kitabayashi-Zin5ceBRvlE-unsplash.webp"
+      type="image/webp"
+    />
+    <style>
+      body {
+        background-image: url("./assets/images/kenji-kitabayashi-Zin5ceBRvlE-unsplash.webp");
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-color: #f5f5f5;
+      }
+    </style>
+    <!-- CSS Preload -->
+    <link
+      rel="preload"
+      href="css/master.css"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript><link rel="stylesheet" href="css/master.css" /></noscript>
+  </head>
+
+  <body>
+    <header>
+      <h1>EUROPEAN WEATHER FORECAST</h1>
+    </header>
+    <div id="loader" class="hidden">
+      <div class="spinner"></div>
+    </div>
+    <main>
+      <!-- Search section -->
+      <section class="search-container">
+        <h2>Search a city for 7 days weather forecast</h2>
+        <!-- Button to toggle between Celsius and Fahrenheit -->
+        <button
+          id="toggle-temp"
+          class="toggle-degr"
+          aria-label="Toggle temperature unit"
+        >
+          Show in °F
+        </button>
+        <!-- Custom dropdown for city selection -->
+        <div class="custom-select-container">
+          <div class="custom-select">
+            <div class="selected" tabindex="0">Sélect a city...</div>
+            <div class="options-container">
+              <!-- Options generate by JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Weather display section -->
+      <div class="weather-container">
+        <div id="current-day" class="weather-current"></div>
+        <div id="next-days" class="weather-next-days"></div>
+      </div>
+    </main>
+    <!-- Footer section -->
+    <footer class="footer">
+      <p class="copyright-text">
+        © Copyright 2025 <span><b>LiveSky Europe</b></span>
+      </p>
+      <p class="powered-by">
+        Powered by
+        <a
+          href="http://www.7timer.info/doc.php?lang=en"
+          target="_blank"
+          rel="noopener noreferrer"
+          data-tooltip="Click to visit 7Timer!"
+        >
+          7Timer!</a
+        >
+      </p>
+    </footer>
+
+    <!-- Main JavaScript file -->
+    <script src="js/main.js"></script>
+  </body>
+</html>
