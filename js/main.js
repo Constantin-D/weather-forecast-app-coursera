@@ -12,7 +12,17 @@ function handleError(message, error = null) {
   console.error(message, error || "");
   const currentDayContainer = document.getElementById("current-day");
   if (currentDayContainer) {
-    currentDayContainer.innerHTML = `<p class="error-message">${message}</p>`;
+    currentDayContainer.innerHTML = `
+      <div class="error-container" role="alert">
+        <p class="error-message">${message}</p>
+        <button class="retry-button" onclick="window.location.reload()">Try Again</button>
+      </div>`;
+  }
+
+  // Announce the error to screen readers
+  const announcer = document.getElementById("sr-announcer");
+  if (announcer) {
+    announcer.textContent = `Error: ${message}`;
   }
 }
 
@@ -34,14 +44,14 @@ function saveUserPreferences(city, lat, lon) {
 }
 
 // Load user preferences from Local Storage
-// Less than 24 hours old
+// Less than 12 hours old
 function loadUserPreferences() {
   try {
     const stored = localStorage.getItem("userPreferences");
     if (stored) {
       const userPreferences = JSON.parse(stored);
       const now = new Date().getTime();
-      const isRecent = now - userPreferences.timestamp < 24 * 60 * 60 * 1000;
+      const isRecent = now - userPreferences.timestamp < 12 * 60 * 60 * 1000;
 
       if (isRecent) {
         isCelsius = userPreferences.temperatureUnit === "Celsius";
@@ -87,17 +97,27 @@ function initCustomSelect(cities) {
   const selected = customSelect.querySelector(".selected");
   const optionsContainer = customSelect.querySelector(".options-container");
 
-  cities.forEach(({ city, country, lat, lon }) => {
+  cities.forEach(({ city, country, lat, lon }, index) => {
     const option = document.createElement("div");
     option.classList.add("option");
+    option.setAttribute("role", "option");
+    option.setAttribute("id", `city-option-${index}`);
     option.textContent = `${city}, ${country}`;
     option.dataset.lat = lat;
     option.dataset.lon = lon;
     optionsContainer.appendChild(option);
   });
 
+  optionsContainer.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      e.target.click();
+    }
+  });
+
   selected.addEventListener("click", () => {
-    customSelect.classList.toggle("active");
+    const isActive = customSelect.classList.toggle("active");
+    customSelect.setAttribute("aria-expanded", isActive);
   });
 
   optionsContainer.addEventListener("click", handleOptionSelection);
@@ -126,28 +146,6 @@ function closeSelectOnClickOutside(e) {
   }
 }
 
-// Populate the dropdown menu with cities and countries
-function populateCitySelect(cities) {
-  const select = document.getElementById("citySelect");
-  cities.forEach(({ city, country, lat, lon }) => {
-    const option = document.createElement("option");
-    option.value = `${lat},${lon}`;
-    option.textContent = `${city}, ${country}`;
-    select.appendChild(option);
-  });
-  select.addEventListener("change", handleCitySelection);
-}
-
-//
-function handleCitySelection(event) {
-  const [lat, lon] = event.target.value.split(",");
-  if (lat && lon) {
-    fetchWeatherData(lat, lon);
-  } else {
-    console.warn("Invalid coordinates !");
-  }
-}
-
 // Show / Hide the loader
 function showLoader() {
   if (loader) {
@@ -159,10 +157,68 @@ function hideLoader() {
   if (loader) loader.classList.add("hidden");
 }
 
+// Cache weather data to reduce API calls
+function getCachedWeatherData(lat, lon) {
+  try {
+    const cacheKey = `weather_${lat}_${lon}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const data = JSON.parse(cached);
+      // Cache valid for 3 hours
+      if (new Date().getTime() - data.timestamp < 3 * 60 * 60 * 1000) {
+        return data.forecast;
+      }
+    }
+  } catch (error) {
+    console.warn("Error reading weather cache", error);
+  }
+  return null;
+}
+
+function cacheWeatherData(lat, lon, forecast) {
+  try {
+    const cacheKey = `weather_${lat}_${lon}`;
+    localStorage.setItem(
+      cacheKey,
+      JSON.stringify({
+        forecast,
+        timestamp: new Date().getTime(),
+      })
+    );
+  } catch (error) {
+    console.warn("Error saving weather cache", error);
+  }
+}
+
 // Fetch weather forecast from the 7Timer! API
 async function fetchWeatherData(lat, lon) {
   showLoader();
+
   try {
+    // Validate coordinates
+    if (
+      isNaN(parseFloat(lat)) ||
+      isNaN(parseFloat(lon)) ||
+      Math.abs(parseFloat(lat)) > 90 ||
+      Math.abs(parseFloat(lon)) > 180
+    ) {
+      throw new Error("Invalid coordinates");
+    }
+
+    // Check cache first
+    const cachedData = getCachedWeatherData(lat, lon);
+    if (cachedData) {
+      console.info("Using cached weather data");
+      displayWeatherCards(cachedData);
+      // Annoncer la mise à jour pour les lecteurs d'écran
+      const announcer = document.getElementById("sr-announcer");
+      if (announcer) {
+        announcer.textContent = `Weather forecast updated for ${lastCityVisited}`;
+      }
+      hideLoader();
+      return;
+    }
+
     const url = `https://www.7timer.info/bin/api.pl?lon=${lon}&lat=${lat}&product=civillight&output=json`;
     const response = await fetch(url);
     if (!response.ok) throw new Error(`API error: ${response.status}`);
@@ -170,6 +226,8 @@ async function fetchWeatherData(lat, lon) {
     const data = await response.json();
     if (!data.dataseries?.length) throw new Error("No weather data available.");
 
+    // Cache the fresh data
+    cacheWeatherData(lat, lon, data.dataseries);
     displayWeatherCards(data.dataseries);
   } catch (error) {
     handleError("Weather data unavailable.", error);
@@ -239,19 +297,24 @@ function createWeatherCard(day, isToday = false) {
     windy: "WINDY",
   };
 
+  const weatherDesc = weatherDescriptions[day.weather] || day.weather;
+
   return `
-        <div class="weather-card ${isToday ? "highlight" : ""}">
+        <div class="weather-card ${isToday ? "highlight" : ""}"
+        aria-label="Weather forecast for ${formatDate(day.date)}${
+    isToday ? ", today" : ""
+  }">
             <h3>${formatDate(day.date)}</h3>
-            <p class="weather-icon">${weatherEmojis[day.weather] || "🌍"}</p>
-            <p class="weather-description">${
-              weatherDescriptions[day.weather] || day.weather
+            <p class="weather-icon" aria-hidden="true">${
+              weatherEmojis[day.weather] || "🌍"
             }</p>
+            <p class="weather-description">${weatherDesc}</p>
             <p>Min: <span class="temp" data-celsius="${min}" data-fahrenheit="${toFahrenheit(
     min
-  )}">${min}°C</span></p>
+  )}" aria-label="Minimum temperature: ${min} degrees Celsius">${min}°C</span></p>
             <p>Max: <span class="temp" data-celsius="${max}" data-fahrenheit="${toFahrenheit(
     max
-  )}">${max}°C</span></p>
+  )}" aria-label="Maximum temperature: ${max} degrees Celsius">${max}°C</span></p>
         </div>`;
 }
 
@@ -286,17 +349,24 @@ document.getElementById("toggle-temp").addEventListener("click", function () {
   isCelsius = !isCurrentlyCelsius;
 
   temps.forEach((temp) => {
-    temp.textContent = isCurrentlyCelsius
-      ? `${temp.dataset.fahrenheit}°F`
-      : `${temp.dataset.celsius}°C`;
+    const value = isCurrentlyCelsius
+      ? temp.dataset.fahrenheit
+      : temp.dataset.celsius;
+    const unit = isCurrentlyCelsius ? "Fahrenheit" : "Celsius";
+
+    temp.textContent = isCurrentlyCelsius ? `${value}°F` : `${value}°C`;
+
+    temp.setAttribute("aria-label", `Temperature: ${value} degrees ${unit}`);
   });
 
   this.textContent = isCurrentlyCelsius ? "Show in °C" : "Show in °F";
+  this.setAttribute("aria-pressed", isCurrentlyCelsius); // Update the aria-pressed attribute
 
   if (lastCityVisited) {
     const selected = customSelect.querySelector(".selected");
-    const cityOption = document.querySelector(
-      `.option[textContent="${selected.textContent}"]`
+    const options = document.querySelectorAll(".option");
+    const cityOption = Array.from(options).find(
+      (opt) => opt.textContent === selected.textContent
     );
     if (cityOption) {
       saveUserPreferences(

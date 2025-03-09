@@ -44,7 +44,7 @@ main {
     --font-size-h2: clamp(1.5rem, 4vw, 2rem);
     --font-size-h3: clamp(1rem, 3vw, 1.5rem);
     --font-size-normal: clamp(0.9rem, 2vw, 1.1rem);
-    --font-size-footer: clamp(1rem, 3vw, 1.5rem);
+    --font-size-footer: clamp(1rem, 3vw, 1.2rem);
     --container-width: clamp(280px, 90%, 1200px);
     --card-width: clamp(250px, 30%, 400px);
     --spacing-small: clamp(8px, 1vw, 15px);
@@ -389,15 +389,22 @@ h1 {
 
 .powered-by a {
     position: relative;
-    color: red;
+    color: #b00;
     text-decoration: none;
     font-weight: bold;
     transition: color var(--transition);
+    display: inline-block;
 }
 
 .powered-by a:hover {
     color: #AC87C5;
     transform: scale(1.3);
+}
+
+.powered-by a:focus {
+    outline: 2px solid var(--bg-color);
+    outline-offset: 2px;
+    color: #AC87C5;
 }
 
 /* Tooltip */
@@ -408,7 +415,6 @@ h1 {
     left: 50%;
     transform: translateX(-50%) scale(0);
     opacity: 0;
-    /* font-size: 0.85rem; */
     font-size: var(--font-size-normal);
     color: var(--text-color);
     background: var(--bg-color);
@@ -436,6 +442,26 @@ h1 {
 .error-message {
     color: red;
     font-weight: bold;
+}
+
+:focus-visible {
+    outline: 2px solid var((--bg-color));
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    /* clip: rect(0, 0, 0, 0); */
+    /* Deprecated MDN*/
+    clip-path: inset(100%);
+    white-space: nowrap;
+    border: 0;
 }
 
 /* TABLET */
