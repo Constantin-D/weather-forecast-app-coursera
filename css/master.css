@@ -35,8 +35,8 @@ main {
     --bg-color: #fff;
     --bg-color-option: #A1E3F9;
     --bg-color-selected: #578FCA;
-    --bg-translucent: rgba(255, 255, 255, 0.6);
-    --text-color: #333;
+    --bg-translucent: rgba(255, 255, 255, 0.8);
+    --text-color: #000;
     --border-radius: 0.625rem;
     --box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     --transition: 0.3s ease-in-out;
@@ -44,6 +44,7 @@ main {
     --font-size-h2: clamp(1.5rem, 4vw, 2rem);
     --font-size-h3: clamp(1rem, 3vw, 1.5rem);
     --font-size-normal: clamp(0.9rem, 2vw, 1.1rem);
+    --font-size-tooltip: clamp(0.6rem, 0.7vw, 0.8rem);
     --font-size-footer: clamp(1rem, 3vw, 1.2rem);
     --container-width: clamp(280px, 90%, 1200px);
     --card-width: clamp(250px, 30%, 400px);
@@ -77,14 +78,14 @@ h1 {
     top: 0;
     left: 0;
     width: 100%;
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.75);
     z-index: 1000;
 }
 
 .spinner {
     width: clamp(3.125rem, 8vw, 6rem);
     height: clamp(3.125rem, 8vw, 6rem);
-    border: clamp(0.3125rem, 0.8vw, 0.5rem) solid transparent;
+    border: clamp(0.3125rem, 0.8vw, 0.8rem) solid transparent;
     border-top: clamp(0.3125rem, 0.8vw, 0.5rem) solid var(--primary-color);
     border-right: clamp(0.3125rem, 0.8vw, 0.5rem) solid var(--primary-color);
     border-radius: 50%;
@@ -289,7 +290,7 @@ h1 {
 
 /* Description */
 .weather-description {
-    font-size: clamp(0.8rem, 1.5vw, 1rem);
+    font-size: clamp(0.8rem, 1.2vw, 1rem);
     font-weight: 600;
     letter-spacing: 0.03rem;
     color: var(--text-color);
@@ -320,7 +321,7 @@ h1 {
 
 /* Sequential Animations */
 .weather-next-days .weather-card:nth-child(1) {
-    animation-delay: 0.2s;
+    animation-delay: 0.3s;
 }
 
 .weather-next-days .weather-card:nth-child(2) {
@@ -389,7 +390,7 @@ h1 {
 
 .powered-by a {
     position: relative;
-    color: #b00;
+    color: #900;
     text-decoration: none;
     font-weight: bold;
     transition: color var(--transition);
@@ -398,7 +399,8 @@ h1 {
 
 .powered-by a:hover {
     color: #AC87C5;
-    transform: scale(1.3);
+    transition: var(--transition);
+    transform: scale(1.2);
 }
 
 .powered-by a:focus {
@@ -415,7 +417,7 @@ h1 {
     left: 50%;
     transform: translateX(-50%) scale(0);
     opacity: 0;
-    font-size: var(--font-size-normal);
+    font-size: var(--font-size-tooltip);
     color: var(--text-color);
     background: var(--bg-color);
     white-space: nowrap;
@@ -440,14 +442,15 @@ h1 {
 }
 
 .error-message {
-    color: red;
+    color: #d00;
     font-weight: bold;
 }
 
 :focus-visible {
-    outline: 2px solid var((--bg-color));
-    outline-offset: 2px;
+    outline: 2px solid var(--bg-color);
+    outline-offset: 3px;
     border-radius: 2px;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
 .sr-only {

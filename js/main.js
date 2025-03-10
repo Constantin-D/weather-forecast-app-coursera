@@ -304,11 +304,12 @@ function createWeatherCard(day, isToday = false) {
         aria-label="Weather forecast for ${formatDate(day.date)}${
     isToday ? ", today" : ""
   }">
-            <h3>${formatDate(day.date)}</h3>
+            <h3 class="weather-date">${formatDate(day.date)}</h3>
             <p class="weather-icon" aria-hidden="true">${
               weatherEmojis[day.weather] || "🌍"
             }</p>
             <p class="weather-description">${weatherDesc}</p>
+            <h4>Temperatures</h4>
             <p>Min: <span class="temp" data-celsius="${min}" data-fahrenheit="${toFahrenheit(
     min
   )}" aria-label="Minimum temperature: ${min} degrees Celsius">${min}°C</span></p>
